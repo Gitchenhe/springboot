@@ -1,0 +1,53 @@
+
+task test << {
+    println '123123'
+}
+
+task test2<<{
+    String str = "chenhe"
+    println "old:"+str
+    println "upper case:"+str.toUpperCase()
+}
+
+task test3<<{
+    3.times{
+        print "$it"
+    }
+}
+
+// 遍历
+task test4<<{
+    String name="chenhe"
+    name.each(){
+        println "${it}"
+    }
+}
+
+// 依赖关系
+task test5<<{
+    println 'this is task 5'
+}
+
+task test6(dependsOn:test5)<<{
+    println 'this is task 6'
+}
+
+task test7
+//println tasks.test7.name
+
+task test8<<{
+    println 'test8'
+}
+task test9<<{
+    println 'test9'
+}
+test8.dependsOn test9
+
+
+task copy(type: Copy){
+    description '任务描述'
+    from './'
+    into 'target'
+    include('**/*.txt','**/*.xml','**/*.properties')
+    println '任务描述应用'
+}
