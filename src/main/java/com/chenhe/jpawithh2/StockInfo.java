@@ -6,19 +6,20 @@ import javax.persistence.Id;
 /**
  * Created by chenhe on 2018/1/3.
  */
-@Entity //@Entity StockInfo是一个JPA实体,由于缺少@Table,这个实体会被映射为table 名字
+@Entity(name = "pub_tstockinfo") //@Entity StockInfo是一个JPA实体,由于缺少@Table,这个实体会被映射为table 名字
 public class StockInfo {
 
     @Id //JPA会把@Id修饰的变量识别为主键
     private String interCode;
-    private String stockName,stockFullName,reportName;//成员没有注解,会默认被映射为同名的column的名字(they’ll be mapped to columns that share the same name as the properties themselves.)
+    private String stockName,stockFullname,reportCode;//成员没有注解,会默认被映射为同名的column的名字(they’ll be mapped to columns that share the same name as the properties themselves.)
 
     public StockInfo(){}
-    public StockInfo(String interCode, String stockName, String stockFullName, String reportName) {
+
+    public StockInfo(String interCode, String stockName, String stockFullname, String reportCode) {
         this.interCode = interCode;
         this.stockName = stockName;
-        this.stockFullName = stockFullName;
-        this.reportName = reportName;
+        this.stockFullname = stockFullname;
+        this.reportCode = reportCode;
     }
 
     public String getInterCode() {
@@ -37,20 +38,20 @@ public class StockInfo {
         this.stockName = stockName;
     }
 
-    public String getStockFullName() {
-        return stockFullName;
+    public String getStockFullname() {
+        return stockFullname;
     }
 
-    public void setStockFullName(String stockFullName) {
-        this.stockFullName = stockFullName;
+    public void setStockFullname(String stockFullname) {
+        this.stockFullname = stockFullname;
     }
 
-    public String getReportName() {
-        return reportName;
+    public String getReportCode() {
+        return reportCode;
     }
 
-    public void setReportName(String reportName) {
-        this.reportName = reportName;
+    public void setReportCode(String reportCode) {
+        this.reportCode = reportCode;
     }
 
     @Override
@@ -58,8 +59,8 @@ public class StockInfo {
         return "StockInfo{" +
                 "interCode='" + interCode + '\'' +
                 ", stockName='" + stockName + '\'' +
-                ", stockFullName='" + stockFullName + '\'' +
-                ", reportName='" + reportName + '\'' +
+                ", stockFullname='" + stockFullname + '\'' +
+                ", reportCode='" + reportCode + '\'' +
                 '}';
     }
 }

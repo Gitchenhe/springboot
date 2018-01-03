@@ -21,7 +21,6 @@ public class BaseController {
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
-        logger.info("=====initBinder=====");
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("YYYY-MM-dd"),true));
         binder.registerCustomEditor(int.class,new PropertyEditorSupport(){
             @Override

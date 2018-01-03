@@ -42,9 +42,9 @@ public class Application  extends SpringBootServletInitializer{
 
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate,StockInfoRepository repository){
-        testH2Jdbc();
+        //testH2Jdbc();//使用mysql作为数据源的时候,注释掉此处,否则报错.因为这里使用的是H2作为数据库,后面多数据源的时候进行修改
 
-        springDataJPATest(repository);
+        //springDataJPATest(repository);
 
         return args -> {
             Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random",Quote.class);
