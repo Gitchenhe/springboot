@@ -1,8 +1,10 @@
 package com.chenhe;
 
+import com.chenhe.h2jdbc.Customer;
 import com.chenhe.restful.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,18 +12,19 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import javax.security.auth.login.LoginContext;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by chenhe on 2017/12/26.
  */
-@RestController
 @SpringBootApplication//核心注解,允许自动配置注解
-@EnableScheduling//允许定时任务执行
+//@EnableScheduling//允许定时任务执行
 @ImportResource({"classpath:spring/spring-context.xml"})
 public class Application  extends SpringBootServletInitializer{
 
@@ -38,9 +41,32 @@ public class Application  extends SpringBootServletInitializer{
 
     @Bean
     public CommandLineRunner run(RestTemplate restTemplate){
+        testH2Jdbc();
+
         return args -> {
             Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random",Quote.class);
             logger.info("演示spring boot消费Restful web service{}",quote.toString());
         };
+    }
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public Customer testH2Jdbc() {
+        logger.info("创建表...");
+        jdbcTemplate.execute("DROP TABLE CUSTOMER IF EXISTS");
+        jdbcTemplate.execute("CREATE TABLE CUSTOMER(ID SERIAL,FIRST_NAME VARCHAR(255), LAST_NAME VARCHAR(255))");
+
+        List<Object[]> splitNames = Arrays.asList("陈贺", "张三", "陈四").stream().map(name -> name.split("")).collect(Collectors.toList());
+
+        splitNames.forEach(name -> logger.info(String.format("插入数据{%s,%s}", name[0], name[1])));
+
+        jdbcTemplate.batchUpdate("INSERT INTO CUSTOMER(FIRST_NAME,LAST_NAME) VALUES (?,?)", splitNames);
+
+        logger.info("查询姓名为陈贺的记录");
+        jdbcTemplate.query("SELECT ID,FIRST_NAME,LAST_NAME FROM CUSTOMER WHERE FIRST_NAME=?", new Object[]{"陈"},
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))).forEach(customer -> logger.info(customer.toString()));
+
+        return new Customer();
     }
 }
