@@ -1,6 +1,8 @@
 package com.chenhe;
 
 import com.chenhe.h2jdbc.Customer;
+import com.chenhe.jpawithh2.StockInfo;
+import com.chenhe.jpawithh2.StockInfoRepository;
 import com.chenhe.restful.Quote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +15,6 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -40,8 +41,10 @@ public class Application  extends SpringBootServletInitializer{
     }
 
     @Bean
-    public CommandLineRunner run(RestTemplate restTemplate){
+    public CommandLineRunner run(RestTemplate restTemplate,StockInfoRepository repository){
         testH2Jdbc();
+
+        springDataJPATest(repository);
 
         return args -> {
             Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random",Quote.class);
@@ -68,5 +71,28 @@ public class Application  extends SpringBootServletInitializer{
                 (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))).forEach(customer -> logger.info(customer.toString()));
 
         return new Customer();
+    }
+
+    /**
+     * 首先他会去Spring Context 中寻找StockInfoRepository, 接着
+     * @param repository
+     */
+    public void springDataJPATest(StockInfoRepository repository){
+        repository.save(new StockInfo("100000","中国平安","中国平安","100000"));
+        repository.save(new StockInfo("600570001","恒生电子","恒生电子","600570"));
+
+        logger.info("证券信息表,查询所有");
+        repository.findAll().forEach(stockInfo -> logger.info(stockInfo.toString()));
+        logger.info("----------------------");
+
+        logger.info("证券信息表,查询一条");
+        StockInfo stockInfo = repository.findOne("100000");
+        logger.info(stockInfo.toString());
+        logger.info("----------------------");
+
+        logger.info("证券信息表,根据证券名称查询");
+        repository.findByStockName("恒生电子").forEach(stockInfo1 -> logger.info(stockInfo1.toString()));
+
+        logger.info("----------------------");
     }
 }
