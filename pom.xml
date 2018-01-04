@@ -46,6 +46,10 @@
             <artifactId>spring-boot-starter-logging</artifactId>
             <version>1.4.1.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
 
         <!-- jdbc start -->
         <dependency>

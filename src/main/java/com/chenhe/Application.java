@@ -4,12 +4,15 @@ import com.chenhe.h2jdbc.Customer;
 import com.chenhe.jpawithh2.StockInfo;
 import com.chenhe.jpawithh2.StockInfoRepository;
 import com.chenhe.restful.Quote;
+import com.chenhe.uploadfile.StorageProperties;
+import com.chenhe.uploadfile.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 @SpringBootApplication//核心注解,允许自动配置注解
 //@EnableScheduling//允许定时任务执行
 @ImportResource({"classpath:spring/spring-context.xml"})
+@EnableConfigurationProperties(StorageProperties.class)
 public class Application  extends SpringBootServletInitializer{
 
     private Logger logger = LoggerFactory.getLogger(Application.class);
@@ -41,10 +45,13 @@ public class Application  extends SpringBootServletInitializer{
     }
 
     @Bean
-    public CommandLineRunner run(RestTemplate restTemplate,StockInfoRepository repository){
+    public CommandLineRunner run(RestTemplate restTemplate, StockInfoRepository repository, StorageService storageService){
         //testH2Jdbc();//使用mysql作为数据源的时候,注释掉此处,否则报错.因为这里使用的是H2作为数据库,后面多数据源的时候进行修改
 
         //springDataJPATest(repository);
+
+        storageService.deleteAll();
+        storageService.init();
 
         return args -> {
             Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random",Quote.class);
